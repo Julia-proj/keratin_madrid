@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --primary:#D54B2A;               /* тёмный кирпично-оранжевый */
-    --primary2:#F06A3F;              /* второй оттенок оранжевого */
+    --primary:#D54B2A;                /* тёмный кирпично-оранжевый */
+    --primary2:#F06A3F;               /* второй оттенок оранжевого */
     --ink:#111;
     --ink-2:#333;
     --muted:#666;
@@ -20,10 +20,18 @@
     --shadow:0 10px 40px rgba(0,0,0,.08);
     --highlight:rgba(213,75,42,.16);
     --bonus-grad:linear-gradient(135deg,#FFF4EF,#FFE6D9);
+    --gold:#c49b61;
   }
+
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:"Inter",system-ui,Segoe UI,Roboto,sans-serif;color:var(--ink);background:#fff;line-height:1.65}
+
+  /* Skip link + progress bar */
+  .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .skip-link:focus{position:fixed;left:12px;top:12px;width:auto;height:auto;background:#000;color:#fff;padding:10px 14px;border-radius:8px;z-index:10000}
+  .read-progress{position:fixed;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--primary),var(--primary2));transform-origin:0 50%;transform:scaleX(0);z-index:9999}
+
   .container{max-width:1140px;margin:0 auto;padding:0 22px}
   .section{padding:68px 0}
   h1{font-size:clamp(34px,5.2vw,56px);line-height:1.08;font-weight:800;letter-spacing:-.02em}
@@ -34,21 +42,32 @@
   .highlight{background:linear-gradient(transparent 58%, var(--highlight) 58%);padding:0 2px;border-radius:3px;font-weight:800}
   .sell{background:linear-gradient(transparent 55%, rgba(213,75,42,.28) 55%);padding:0 4px;border-radius:4px}
 
-  /* HERO (с fallback hero.jpg) */
-  .hero{color:#fff;text-align:center;padding:136px 0 110px;
+  /* HERO with parallax layer (::before) and two fallbacks */
+  .hero{
+    color:#fff;text-align:center;min-height:74vh;padding:136px 0 110px;position:relative;isolation:isolate;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;z-index:-2;
     background:
       linear-gradient(180deg,rgba(0,0,0,.68),rgba(0,0,0,.52)),
       url("/images/hero_final.jpg"),
       url("/images/hero.jpg");
-    background-position:center;
-    background-size:cover;
-    background-repeat:no-repeat;
+    background-position:center; background-size:cover; background-repeat:no-repeat;
+    will-change:transform;
+    transform:translateY(0);
   }
   .hero p{max-width:820px;margin:14px auto 20px;font-size:18px;color:#f2f2f2}
-  .cta{display:inline-block;padding:18px 34px;border-radius:50px;background:var(--brand-grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 12px 36px rgba(213,75,42,.32);transition:.25s;border:none;cursor:pointer}
-  .cta:hover{transform:translateY(-3px);filter:brightness(1.05)}
 
-  /* Карточки / сетки */
+  .cta{display:inline-block;padding:18px 34px;border-radius:50px;background:var(--brand-grad);color:#fff;font-weight:800;text-decoration:none;box-shadow:0 12px 36px rgba(213,75,42,.32);transition:.25s;border:none;cursor:pointer;position:relative;overflow:hidden}
+  .cta:hover{transform:translateY(-3px);filter:brightness(1.05)}
+  /* shimmer */
+  .cta::after{
+    content:"";position:absolute;top:0;left:-120%;width:120%;height:100%;
+    background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.45) 50%,transparent 100%);
+    transform:skewX(-20deg);animation:shimmer 2.6s infinite;
+  }
+
+  /* Cards / grids */
   .section-card{background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);margin:32px auto;overflow:hidden}
   .inner{padding:46px 34px}
   .grid{display:grid;gap:20px}
@@ -57,7 +76,7 @@
   .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:22px;transition:.25s;position:relative}
   .card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(0,0,0,.08);border-color:var(--primary)}
 
-  /* Иконки — качественные бизнес иконки */
+  /* Icons */
   .icon{width:54px;height:54px;border-radius:12px;background:#f6f7f8;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
   .icon svg{width:26px;height:26px;stroke:#111;stroke-width:1.5;fill:none}
   .icon.danger{background:#FFF1F1;border-color:#F7C5C7}
@@ -65,47 +84,21 @@
   .icon.success{background:#E9F6F0;border-color:#CBEBDD}
   .icon.success svg{stroke:var(--success)}
 
-  /* Блок «Сейчас» — новый стиль */
-  .problem-redesign {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    margin-top: 24px;
-  }
-  .problem-before-section, .problem-after-section {
-    border-radius: 16px;
-    padding: 28px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, .04);
-    border: 1px solid var(--border);
-  }
-  .problem-before-section {
-    background: rgba(229, 62, 62, 0.03);
-    border-color: rgba(229, 62, 62, 0.15);
-  }
-  .problem-after-section {
-    background: rgba(31, 157, 104, 0.03);
-    border-color: rgba(31, 157, 104, 0.15);
-  }
-  .problem-title {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    font-weight: 800;
-    margin-bottom: 16px;
-    font-size: 18px;
-    font-family:"Inter",system-ui,sans-serif
-  }
-  .problem-title h3 {
-    margin: 0;
-  }
+  /* Before/After blocks */
+  .problem-redesign {display:flex;flex-direction:column;gap:40px;margin-top:24px}
+  .problem-before-section,.problem-after-section{border-radius:16px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,.04);border:1px solid var(--border)}
+  .problem-before-section{background:rgba(229,62,62,.03);border-color:rgba(229,62,62,.15)}
+  .problem-after-section{background:rgba(31,157,104,.03);border-color:rgba(31,157,104,.15)}
+  .problem-title{display:flex;gap:12px;align-items:center;font-weight:800;margin-bottom:16px;font-size:18px}
+  .problem-title h3{margin:0}
   .problem-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff}
   .problem-before-section .problem-icon{background:var(--danger)}
   .problem-after-section .problem-icon{background:var(--success)}
   .problem-list{list-style:none}
-  .problem-list li{display:flex;gap:12px;align-items:flex-start;margin:12px 0;font-size:16px;line-height:1.5;color:var(--ink-2);font-family:"Inter",system-ui,sans-serif}
+  .problem-list li{display:flex;gap:12px;align-items:flex-start;margin:12px 0;font-size:16px;line-height:1.5;color:var(--ink-2)}
   .problem-list svg{width:18px;height:18px;flex:0 0 18px;margin-top:2px}
 
-  /* «Почему важно» — красные иконки + больше отступа сверху */
+  /* Why important */
   .why-important{margin-top:60px}
   .why-important h3{text-align:center;margin-bottom:32px;font-size:22px}
   .why-grid{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;margin-top:24px}
@@ -114,30 +107,30 @@
   .why-icon svg{width:28px;height:28px;stroke:var(--danger);fill:none}
   .why-text{font-weight:700;color:var(--ink-2);font-size:15px;line-height:1.4}
 
-  /* «Кому подходят» */
+  /* Who */
   .who-grid{display:grid;gap:20px;grid-template-columns:repeat(2,1fr)}
 
-  /* «Что получаете» — зелёные заголовки */
+  /* Get — green headings */
   .get-grid .card h3{color:var(--success)}
 
-  /* Conversion блок с фоном */
-  .conversion{color:#fff;text-align:center;padding:100px 0;position:relative;
-    background:
+  /* Conversion block (uses same hero images) */
+  .conversion{color:#fff;text-align:center;padding:100px 0;position:relative;isolation:isolate}
+  .conversion::before{
+    content:"";position:absolute;inset:0;z-index:-2;background:
       linear-gradient(180deg,rgba(0,0,0,.75),rgba(0,0,0,.65)),
       url("/images/hero_final.jpg"),
       url("/images/hero.jpg");
-    background-position:center bottom;
-    background-size:cover;
-    background-repeat:no-repeat;
+    background-position:center bottom;background-size:cover;background-repeat:no-repeat;
   }
   .conversion h2{color:#fff;margin-bottom:16px}
   .conversion p{font-size:18px;margin-bottom:28px;opacity:.95;max-width:600px;margin-left:auto;margin-right:auto}
   .conversion .icon{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);margin:0 auto 24px}
   .conversion .icon svg{stroke:#fff}
 
-  /* Бонусы — праздничнее */
-  .bonus{background:var(--bonus-grad);border:1px solid #ffd6c5;border-radius:20px}
+  /* Bonus — festive + confetti area */
+  .bonus{background:var(--bonus-grad);border:1px solid #ffd6c5;border-radius:20px;position:relative;overflow:hidden}
   .bonus .inner{padding:40px 28px}
+  .confetti{position:absolute;inset:0;pointer-events:none}
   .bonus-list{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
   .bonus-item{background:#fff;border:1px solid #ffdccc;border-radius:14px;padding:18px;display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;box-shadow:0 8px 22px rgba(213,75,42,.08)}
   .gift{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center}
@@ -148,17 +141,18 @@
   .badge-old{color:#999;text-decoration:line-through;margin-right:6px}
   .badge-new{background:var(--primary);color:#fff;border-radius:6px;padding:2px 6px;font-weight:800}
 
-  /* Пакет - улучшенный дизайн */
+  /* Pricing with subtle gold glow */
   .pricing{display:flex;justify-content:center}
   .price-card{text-align:center;padding:48px 40px;border:2px solid var(--primary);border-radius:24px;background:#fff;box-shadow:0 20px 50px rgba(213,75,42,.12);max-width:500px;width:100%}
   .price-card h3{font-size:24px;margin-bottom:12px}
-  .price{font-size:48px;font-weight:800;color:var(--primary);margin:20px 0}
+  .price{font-size:48px;font-weight:800;color:var(--primary);margin:20px 0;text-shadow:0 0 0 rgba(0,0,0,0)}
+  .gold-glow{box-shadow:0 0 0 rgba(0,0,0,0)}
   .price-card .muted{font-size:16px;margin-bottom:24px}
   .btn-buy{display:block;background:var(--brand-grad);color:#fff;padding:20px 32px;border-radius:50px;text-decoration:none;font-weight:800;transition:.18s;margin:24px 0;font-size:18px}
   .btn-buy:hover{transform:translateY(-2px)}
   .access-note{font-size:14px;color:var(--muted);margin-top:12px}
 
-  /* «Что изменится сразу» */
+  /* Wins */
   .wins{list-style:none;display:grid;gap:12px;margin-top:12px}
   .wins li{display:flex;gap:12px;align-items:flex-start}
   .check{width:20px;height:20px;stroke:#fff}
@@ -170,19 +164,33 @@
   .faq-a{display:none;padding:16px 18px;color:#555;border-top:1px solid var(--border)}
   .faq-q .arr{transition:.2s}
 
-  /* Sticky CTA */
-  .sticky-cta{position:fixed;left:0;right:0;bottom:-90px;background:var(--brand-grad);color:#fff;text-align:center;padding:12px;font-weight:800;transition:.35s;z-index:999}
+  /* Sticky CTA (appears after 50% scroll) */
+  .sticky-cta{position:fixed;left:0;right:0;bottom:-90px;background:var(--brand-grad);color:#fff;text-align:center;padding:12px;font-weight:800;transition:.35s;z-index:999;box-shadow:0 -8px 24px rgba(213,75,42,.18)}
   .sticky-cta.show{bottom:0}
 
-  /* Анимация появления */
+  /* Exit-intent dialog */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:10000}
+  .modal{background:#fff;border-radius:16px;max-width:520px;width:92%;padding:24px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(0,0,0,.24)}
+  .modal h3{font-size:22px;margin-bottom:8px}
+  .modal p{color:#444;margin-bottom:18px}
+  .modal .row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{padding:14px 18px;border-radius:12px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:800}
+  .btn-primary{background:var(--brand-grad);border:none;color:#fff}
+  .modal-close{position:absolute;right:14px;top:10px;background:transparent;border:none;font-size:22px;cursor:pointer}
+
+  /* Focus visible & a11y */
+  :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
+
+  /* Animations */
+  @keyframes shimmer{0%{left:-120%}100%{left:120%}}
+  @keyframes gold{0%{box-shadow:0 0 0 rgba(196,155,97,0)} 50%{box-shadow:0 0 24px 6px rgba(196,155,97,.35)} 100%{box-shadow:0 0 0 rgba(196,155,97,0)}}
+
+  /* Reveal */
   .reveal{opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s}
   .reveal.show{opacity:1;transform:translateY(0)}
 
-  /* Адаптив */
-  @media (max-width:1024px){
-    .problem-redesign {gap: 16px;}
-    .why-grid{gap:24px}
-  }
+  /* Responsive */
+  @media (max-width:1024px){.problem-redesign{gap:16px}.why-grid{gap:24px}}
   @media (max-width:840px){
     .grid-3{grid-template-columns:repeat(2,1fr)}
     .why-grid{flex-direction:column;align-items:center;gap:20px}
@@ -196,78 +204,43 @@
     .price-card{padding:36px 24px}
     .conversion{padding:80px 0}
   }
+
+  /* Respect reduced motion: убираем все анимации */
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1;transform:none}
+    .cta::after{animation:none;display:none}
+    .gold-glow{animation:none}
+    .read-progress{transition:none}
+  }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Перейти к основному содержанию</a>
+<div class="read-progress" aria-hidden="true"></div>
 
-<svg width="0" height="0" style="position:absolute;visibility:hidden">
+<!-- Inline SVG symbols -->
+<svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none"/></symbol>
   <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
-
-  <symbol id="i-dollar" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M9.5 8.5c0-1.5 1.5-2.5 2.5-2.5s2.5 1 2.5 2.5-1 2.5-2.5 2.5h-1c-1.5 0-2.5 1-2.5 2.5s1 2.5 2.5 2.5 2.5-1 2.5-2.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <line x1="12" y1="6" x2="12" y2="8" stroke="currentColor" stroke-width="1.5"/>
-    <line x1="12" y1="16" x2="12" y2="18" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-  </symbol>
-  <symbol id="i-exit" viewBox="0 0 24 24">
-    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" fill="none"/>
-  </symbol>
-
-  <symbol id="i-scissors" viewBox="0 0 24 24">
-    <path d="M3 12h3l8-8 8 8H9" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M21 15l-7-7" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-med" viewBox="0 0 24 24">
-    <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-users3" viewBox="0 0 24 24">
-    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <circle cx="8.5" cy="7" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M20 8v6M17 11h6" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-user" viewBox="0 0 24 24">
-    <circle cx="12" cy="8" r="5" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-  </symbol>
-
-  <symbol id="i-message" viewBox="0 0 24 24">
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-  </symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-rocket" viewBox="0 0 24 24">
-    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09zM12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M15 9v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-refresh" viewBox="0 0 24 24">
-    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M8 16h5v5" stroke="currentColor" stroke-width="1.5" fill="none"/>
-  </symbol>
-  <symbol id="i-book" viewBox="0 0 24 24">
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M8 7h6M8 11h8" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
-  <symbol id="i-gift" viewBox="0 0 24 24">
-    <rect x="3" y="8" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <path d="M12 8V5a2 2 0 0 0-4 0c0 1.5 2 2 4 2zM12 8V5a2 2 0 0 1 4 0c0 1.5-2 2-4 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-    <line x1="12" y1="8" x2="12" y2="19" stroke="currentColor" stroke-width="1.5"/>
-  </symbol>
+  <symbol id="i-dollar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M9.5 8.5c0-1.5 1.5-2.5 2.5-2.5s2.5 1 2.5 2.5-1 2.5-2.5 2.5h-1c-1.5 0-2.5 1-2.5 2.5s1 2.5 2.5 2.5 2.5-1 2.5-2.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="12" y1="6" x2="12" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="16" x2="12" y2="18" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5" fill="none"/></symbol>
+  <symbol id="i-exit" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" fill="none"/></symbol>
+  <symbol id="i-scissors" viewBox="0 0 24 24"><path d="M3 12h3l8-8 8 8H9" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M21 15l-7-7" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-med" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-users3" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="8.5" cy="7" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M20 8v6M17 11h6" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" fill="none"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" stroke-width="1.5" fill="none"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09zM12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M15 9v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 16h5v5" stroke="currentColor" stroke-width="1.5" fill="none"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 7h6M8 11h8" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M12 8V5a2 2 0 0 0-4 0c0 1.5 2 2 4 2zM12 8V5a2 2 0 0 1 4 0c0 1.5-2 2-4 2z" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="12" y1="8" x2="12" y2="19" stroke="currentColor" stroke-width="1.5"/></symbol>
 </svg>
 
-<section class="hero">
+<main id="main">
+
+<section class="hero" aria-label="Вступительный блок">
   <div class="container">
     <h1 class="reveal">Скрипты, которые превращают <span class="accent">сообщения в деньги</span></h1>
     <p class="reveal">Готовые диалоги: от первого сообщения до записи, апсейла и закрытия возражений. <span class="sell">Результат — больше записей, выше средний чек, меньше времени на переписку.</span></p>
@@ -275,51 +248,51 @@
   </div>
 </section>
 
-<section class="section">
+<section class="section" aria-labelledby="sec-now">
   <div class="container section-card"><div class="inner">
-    <h2 class="reveal">Сейчас</h2>
+    <h2 id="sec-now" class="reveal">Сейчас</h2>
 
     <div class="problem-redesign">
       <div class="problem-before-section reveal">
         <div class="problem-title">
-          <div class="problem-icon"><svg class="check"><use href="#i-x"/></svg></div>
+          <div class="problem-icon"><svg class="check" aria-hidden="true"><use href="#i-x"/></svg></div>
           <h3>Без скриптов</h3>
         </div>
         <ul class="problem-list">
-          <li><svg style="stroke:var(--danger)"><use href="#i-x"/></svg>Клиент пишет «Сколько стоит?», вы отвечаете цену, и наступает тишина.</li>
-          <li><svg style="stroke:var(--danger)"><use href="#i-x"/></svg>На «я подумаю» нет <span class="highlight">следующего шага</span>.</li>
-          <li><svg style="stroke:var(--danger)"><use href="#i-x"/></svg>Переписка тянется, клиент <span class="highlight">остывает</span>.</li>
-          <li><svg style="stroke:var(--danger)"><use href="#i-x"/></svg>Из 10 заявок записывается всего 2–3.</li>
+          <li><svg style="stroke:var(--danger)" aria-hidden="true"><use href="#i-x"/></svg>Клиент пишет «Сколько стоит?», вы отвечаете цену — и тишина.</li>
+          <li><svg style="stroke:var(--danger)" aria-hidden="true"><use href="#i-x"/></svg>На «я подумаю» нет <span class="highlight">следующего шага</span>.</li>
+          <li><svg style="stroke:var(--danger)" aria-hidden="true"><use href="#i-x"/></svg>Переписка тянется, клиент <span class="highlight">остывает</span>.</li>
+          <li><svg style="stroke:var(--danger)" aria-hidden="true"><use href="#i-x"/></svg>Из 10 заявок записывается всего 2–3.</li>
         </ul>
       </div>
 
       <div class="problem-after-section reveal">
         <div class="problem-title">
-          <div class="problem-icon"><svg class="check"><use href="#i-check"/></svg></div>
+          <div class="problem-icon"><svg class="check" aria-hidden="true"><use href="#i-check"/></svg></div>
           <h3>Со скриптами</h3>
         </div>
         <ul class="problem-list">
-          <li><svg style="stroke:var(--success)"><use href="#i-check"/></svg>На любой вопрос есть <span class="highlight">готовый ответ</span>.</li>
-          <li><svg style="stroke:var(--success)"><use href="#i-check"/></svg>Возражения закрываются <span class="highlight">мягко и без давления</span>.</li>
-          <li><svg style="stroke:var(--success)"><use href="#i-check"/></svg>До записи — всего <span class="highlight">3–5 сообщений</span>.</li>
-          <li><svg style="stroke:var(--success)"><use href="#i-check"/></svg>Из 10 заявок записывается уже <span class="highlight">6–7</span>.</li>
+          <li><svg style="stroke:var(--success)" aria-hidden="true"><use href="#i-check"/></svg>На любой вопрос есть <span class="highlight">готовый ответ</span>.</li>
+          <li><svg style="stroke:var(--success)" aria-hidden="true"><use href="#i-check"/></svg>Возражения закрываются <span class="highlight">мягко и без давления</span>.</li>
+          <li><svg style="stroke:var(--success)" aria-hidden="true"><use href="#i-check"/></svg>До записи — всего <span class="highlight">3–5 сообщений</span>.</li>
+          <li><svg style="stroke:var(--success)" aria-hidden="true"><use href="#i-check"/></svg>Из 10 заявок записывается уже <span class="highlight">6–7</span>.</li>
         </ul>
       </div>
     </div>
 
-    <div class="why-important reveal">
-      <h3>Почему это <span class="accent">важно</span></h3>
+    <div class="why-important reveal" aria-labelledby="why-title">
+      <h3 id="why-title">Почему это <span class="accent">важно</span></h3>
       <div class="why-grid">
         <div class="why-item">
-          <div class="why-icon"><svg><use href="#i-dollar"/></svg></div>
+          <div class="why-icon"><svg aria-hidden="true"><use href="#i-dollar"/></svg></div>
           <div class="why-text">Сливаются деньги на рекламу</div>
         </div>
         <div class="why-item">
-          <div class="why-icon"><svg><use href="#i-clock"/></svg></div>
+          <div class="why-icon"><svg aria-hidden="true"><use href="#i-clock"/></svg></div>
           <div class="why-text">Тратится время впустую</div>
         </div>
         <div class="why-item">
-          <div class="why-icon"><svg><use href="#i-exit"/></svg></div>
+          <div class="why-icon"><svg aria-hidden="true"><use href="#i-exit"/></svg></div>
           <div class="why-text">Заявки уходят к конкурентам и теряется прибыль</div>
         </div>
       </div>
@@ -328,27 +301,27 @@
   </div></div>
 </section>
 
-<section class="section">
+<section class="section" aria-labelledby="who">
   <div class="container section-card"><div class="inner">
-    <h2 class="reveal">Кому подходят <span class="accent">скрипты</span></h2>
+    <h2 id="who" class="reveal">Кому подходят <span class="accent">скрипты</span></h2>
     <div class="who-grid">
       <div class="card reveal">
-        <div class="icon"><svg><use href="#i-scissors"/></svg></div>
+        <div class="icon" aria-hidden="true"><svg><use href="#i-scissors"/></svg></div>
         <h3>Владельцам салонов и студий</h3>
         <p class="muted">Стандарт ответов, <span class="highlight">скорость</span> и контроль: все отвечают одинаково сильно.</p>
       </div>
       <div class="card reveal">
-        <div class="icon"><svg><use href="#i-med"/></svg></div>
+        <div class="icon" aria-hidden="true"><svg><use href="#i-med"/></svg></div>
         <h3>Медицинским центрам</h3>
         <p class="muted">Админы закрывают заявки, врачи работают с <span class="highlight">реальными пациентами</span>.</p>
       </div>
       <div class="card reveal">
-        <div class="icon"><svg><use href="#i-users3"/></svg></div>
+        <div class="icon" aria-hidden="true"><svg><use href="#i-users3"/></svg></div>
         <h3>Мастерам-универсалам</h3>
         <p class="muted">Ответы на все типовые ситуации — <span class="highlight">быстрее к записи</span>, увереннее в чате.</p>
       </div>
       <div class="card reveal">
-        <div class="icon"><svg><use href="#i-user"/></svg></div>
+        <div class="icon" aria-hidden="true"><svg><use href="#i-user"/></svg></div>
         <h3>Узким специалистам</h3>
         <p class="muted">Ногти, брови, ресницы, волосы, косметология, перманент — <span class="highlight">готовые блоки под услугу</span>.</p>
       </div>
@@ -356,105 +329,168 @@
   </div></div>
 </section>
 
-<section class="section">
+<section class="section" aria-labelledby="get">
   <div class="container section-card"><div class="inner">
-    <h2 class="reveal">Что <span class="accent">получаете</span> в системе</h2>
+    <h2 id="get" class="reveal">Что <span class="accent">получаете</span> в системе</h2>
     <div class="grid grid-3 get-grid">
-      <div class="card reveal"><div class="icon"><svg><use href="#i-message"/></svg></div><h3>Готовые диалоги</h3><p>Приветствие, цены, запись, напоминания, апсейл — <span class="highlight">копируй и вставляй</span>.</p></div>
-      <div class="card reveal"><div class="icon"><svg><use href="#i-shield"/></svg></div><h3>Ответы на возражения</h3><p>«Дорого», «далеко», «подумаю» — <span class="highlight">живые формулировки</span> без давления.</p></div>
-      <div class="card reveal"><div class="icon"><svg><use href="#i-rocket"/></svg></div><h3>Под услуги</h3><p>Ногти, брови, ресницы, волосы, косметология, перманент — <span class="highlight">готовые блоки</span>.</p></div>
-      <div class="card reveal"><div class="icon"><svg><use href="#i-refresh"/></svg></div><h3>Возврат «молчунов»</h3><p>Сценарии для повторных записей и возврата «остывших» лидов.</p></div>
-      <div class="card reveal"><div class="icon"><svg><use href="#i-book"/></svg></div><h3>Гайд внедрения</h3><p><span class="highlight">Старт за 1 день</span> — пошаговый план + стандарты для команды.</p></div>
-      <div class="card reveal"><div class="icon"><svg><use href="#i-check"/></svg></div><h3>Итог</h3><p><span class="highlight">Больше записей</span>, выше средний чек, меньше времени в переписке.</p></div>
+      <div class="card reveal"><div class="icon" aria-hidden="true"><svg><use href="#i-message"/></svg></div><h3>Готовые диалоги</h3><p>Приветствие, цены, запись, напоминания, апсейл — <span class="highlight">копируй и вставляй</span>.</p></div>
+      <div class="card reveal"><div class="icon" aria-hidden="true"><svg><use href="#i-shield"/></svg></div><h3>Ответы на возражения</h3><p>«Дорого», «далеко», «подумаю» — <span class="highlight">живые формулировки</span> без давления.</p></div>
+      <div class="card reveal"><div class="icon" aria-hidden="true"><svg><use href="#i-rocket"/></svg></div><h3>Под услуги</h3><p>Ногти, брови, ресницы, волосы, косметология, перманент — <span class="highlight">готовые блоки</span>.</p></div>
+      <div class="card reveal"><div class="icon" aria-hidden="true"><svg><use href="#i-refresh"/></svg></div><h3>Возврат «молчунов»</h3><p>Сценарии для повторных записей и возврата «остывших» лидов.</p></div>
+      <div class="card reveal"><div class="icon" aria-hidden="true"><svg><use href="#i-book"/></svg></div><h3>Гайд внедрения</h3><p><span class="highlight">Старт за 1 день</span> — пошаговый план + стандарты для команды.</p></div>
+      <div class="card reveal"><div class="icon" aria-hidden="true"><svg><use href="#i-check"/></svg></div><h3>Итог</h3><p><span class="highlight">Больше записей</span>, выше средний чек, меньше времени в переписке.</p></div>
     </div>
   </div></div>
 </section>
 
-<section class="conversion">
+<section class="conversion" aria-label="Призыв к действию">
   <div class="container">
-    <div class="icon reveal"><svg><use href="#i-rocket"/></svg></div>
+    <div class="icon reveal" aria-hidden="true"><svg><use href="#i-rocket"/></svg></div>
     <h2 class="reveal">Хватит терять деньги из-за неправильных слов</h2>
     <p class="reveal">Внедри скрипты моментально и начни получать больше записей уже сегодня</p>
     <button class="cta reveal" data-pay="full">Купить</button>
   </div>
 </section>
 
-<section class="section">
-  <div class="container bonus"><div class="inner">
-    <h2 class="reveal">Бонусы при покупке 🎉</h2>
+<section class="section" aria-labelledby="bonus">
+  <div class="container bonus"><canvas class="confetti" id="confetti" aria-hidden="true"></canvas><div class="inner">
+    <h2 id="bonus" class="reveal">Бонусы при покупке 🎉</h2>
     <p class="muted reveal" style="text-align:center;margin-bottom:18px">Суммарная ценность — <b>79€</b>. Сегодня идут <b>бесплатно</b> со скриптами.</p>
     <div class="bonus-list">
-      <div class="bonus-item reveal"><div class="gift orange"><svg><use href="#i-gift"/></svg></div><div><h3>🎁 Гайд 1</h3><p class="muted">Работа с клиентской базой — повторные записи без рекламы.</p></div><div class="bonus-price"><span class="badge-old">27€</span><span class="badge-new">0€</span></div></div>
-      <div class="bonus-item reveal"><div class="gift green"><svg><use href="#i-gift"/></svg></div><div><h3>🎁 Чек-лист</h3><p class="muted">Платные и бесплатные способы — где взять заявки сегодня.</p></div><div class="bonus-price"><span class="badge-old">32€</span><span class="badge-new">0€</span></div></div>
-      <div class="bonus-item reveal"><div class="gift blue"><svg><use href="#i-gift"/></svg></div><div><h3>🎁 Гайд 2</h3><p class="muted">5 этапов продаж на консультации — мягкий апсейл доп.услуг.</p></div><div class="bonus-price"><span class="badge-old">20€</span><span class="badge-new">0€</span></div></div>
+      <div class="bonus-item reveal"><div class="gift orange" aria-hidden="true"><svg><use href="#i-gift"/></svg></div><div><h3>🎁 Гайд 1</h3><p class="muted">Работа с клиентской базой — повторные записи без рекламы.</p></div><div class="bonus-price"><span class="badge-old">27€</span><span class="badge-new">0€</span></div></div>
+      <div class="bonus-item reveal"><div class="gift green" aria-hidden="true"><svg><use href="#i-gift"/></svg></div><div><h3>🎁 Чек-лист</h3><p class="muted">Платные и бесплатные способы — где взять заявки сегодня.</p></div><div class="bonus-price"><span class="badge-old">32€</span><span class="badge-new">0€</span></div></div>
+      <div class="bonus-item reveal"><div class="gift blue" aria-hidden="true"><svg><use href="#i-gift"/></svg></div><div><h3>🎁 Гайд 2</h3><p class="muted">5 этапов продаж на консультации — мягкий апсейл доп.услуг.</p></div><div class="bonus-price"><span class="badge-old">20€</span><span class="badge-new">0€</span></div></div>
     </div>
   </div></div>
 </section>
 
-<section class="section">
+<section class="section" aria-labelledby="wins">
   <div class="container section-card"><div class="inner">
-    <h2 class="reveal">Что изменится <span class="accent">сразу</span></h2>
+    <h2 id="wins" class="reveal">Что изменится <span class="accent">сразу</span></h2>
     <ul class="wins reveal">
-      <li><span class="check-wrap"><svg class="check"><use href="#i-check"/></svg></span> Перестанешь <span class="highlight">терять заявки</span> из-за слабых ответов.</li>
-      <li><span class="check-wrap"><svg class="check"><use href="#i-check"/></svg></span> Начнёшь <span class="highlight">закрывать больше записей</span> уже с первого дня.</li>
-      <li><span class="check-wrap"><svg class="check"><use href="#i-check"/></svg></span> Повысишь <span class="highlight">средний чек</span> через правильные предложения.</li>
-      <li><span class="check-wrap"><svg class="check"><use href="#i-check"/></svg></span> Станешь увереннее — на всё есть <span class="highlight">готовый ответ</span>.</li>
+      <li><span class="check-wrap" aria-hidden="true"><svg class="check"><use href="#i-check"/></svg></span> Перестанешь <span class="highlight">терять заявки</span> из-за слабых ответов.</li>
+      <li><span class="check-wrap" aria-hidden="true"><svg class="check"><use href="#i-check"/></svg></span> Начнёшь <span class="highlight">закрывать больше записей</span> уже с первого дня.</li>
+      <li><span class="check-wrap" aria-hidden="true"><svg class="check"><use href="#i-check"/></svg></span> Повысишь <span class="highlight">средний чек</span> через правильные предложения.</li>
+      <li><span class="check-wrap" aria-hidden="true"><svg class="check"><use href="#i-check"/></svg></span> Станешь увереннее — на всё есть <span class="highlight">готовый ответ</span>.</li>
     </ul>
   </div></div>
 </section>
 
-<section class="section" id="pricing">
+<section class="section" id="pricing" aria-labelledby="pkg">
   <div class="container section-card"><div class="inner">
-    <h2 class="reveal">Полный <span class="accent">пакет</span></h2>
+    <h2 id="pkg" class="reveal">Полный <span class="accent">пакет</span></h2>
     <div class="pricing">
       <div class="price-card reveal">
         <h3>Полный пакет + 3 бонуса</h3>
-        <div class="price">19€</div>
+        <div class="price gold-glow">19€</div>
         <p class="muted">Все скрипты + персонализация + бонусы</p>
-        <a class="btn-buy" href="#" data-pay="full">Купить</a>
+        <a class="btn-buy" href="#" data-pay="full" aria-label="Купить полный пакет за 19 евро">Купить</a>
         <p class="access-note">Доступ к материалам моментально после оплаты</p>
       </div>
     </div>
   </div></div>
 </section>
 
-<section class="section">
+<section class="section" aria-labelledby="faq">
   <div class="container section-card"><div class="inner">
-    <h2 class="reveal">FAQ</h2>
+    <h2 id="faq" class="reveal">FAQ</h2>
     <div class="faq-item reveal">
-      <div class="faq-q">Сработает в моей нише?<span class="arr">▾</span></div>
+      <div class="faq-q">Сработает в моей нише?<span class="arr" aria-hidden="true">▾</span></div>
       <div class="faq-a">Да. База универсальная + блоки под ногти/брови/ресницы/волосы/косметологию/перманент.</div>
     </div>
     <div class="faq-item reveal">
-      <div class="faq-q">Не будет ли звучать «по-скриптовому»?<span class="arr">▾</span></div>
+      <div class="faq-q">Не будет ли звучать «по-скриптовому»?<span class="arr" aria-hidden="true">▾</span></div>
       <div class="faq-a">Нет. Формулировки живые, адаптируешь под свой тон. Главное — следовать алгоритму.</div>
     </div>
     <div class="faq-item reveal">
-      <div class="faq-q">Зачем это админам?<span class="arr">▾</span></div>
+      <div class="faq-q">Зачем это админам?<span class="arr" aria-hidden="true">▾</span></div>
       <div class="faq-a">Единый стандарт повышает конверсию, скорость и управляемость. Новички включаются быстрее.</div>
     </div>
     <div class="faq-item reveal">
-      <div class="faq-q">Когда будут результаты?<span class="arr">▾</span></div>
+      <div class="faq-q">Когда будут результаты?<span class="arr" aria-hidden="true">▾</span></div>
       <div class="faq-a">Часто — в первые 24 часа: готовые фразы экономят время и быстрее ведут к записи.</div>
     </div>
   </div></div>
 </section>
 
-<div class="sticky-cta">Готовые скрипты — 19€ • Купить сейчас</div>
+</main>
+
+<div class="sticky-cta" role="region" aria-label="Плавающий призыв">Готовые скрипты — 19€ • Купить сейчас</div>
+
+<!-- Exit-intent modal -->
+<div class="modal-backdrop" id="exitModal" role="dialog" aria-modal="true" aria-labelledby="exitTitle" aria-describedby="exitDesc">
+  <div class="modal" tabindex="-1">
+    <button class="modal-close" aria-label="Закрыть">×</button>
+    <h3 id="exitTitle">Забрать бонусы сейчас?</h3>
+    <p id="exitDesc">Скрипты + 3 бонуса сегодня за <b>19€</b>. Доступ моментально 🌟</p>
+    <div class="row">
+      <button class="btn btn-primary" data-pay="full">Купить</button>
+      <button class="btn modal-close-2">Может позже</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // Лёгкая анимация появления (как у Милы)
+  // ===== Feature flags =====
+  const FEATURE_VIEWERS = false; // этический счётчик «сейчас смотрят». Вкл = true (демо без бэкенда)
+
+  // ===== Reveal on scroll =====
   let io;
   function observeAll(){
     if(io) io.disconnect();
     io=new IntersectionObserver((entries)=>{
       entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target);} });
     },{threshold:0.12});
-    document.querySelectorAll('.reveal, .section-card').forEach(el=>{ io.observe(el); });
+    document.querySelectorAll('.reveal, .section-card').forEach(el=> io.observe(el));
   }
   document.addEventListener('DOMContentLoaded',observeAll);
 
-  // FAQ раскрытие
+  // ===== Hero parallax (soft 0..20px) =====
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduceMotion){
+    const hero = document.querySelector('.hero');
+    const parallax = () => {
+      const y = Math.min(20, window.scrollY * 0.08);
+      hero && (hero.style.setProperty('--py', y+'px'));
+      // move ::before via CSS var
+      hero && (hero.style.setProperty('--parallax', `translateY(${y}px)`));
+      hero?.style.setProperty('--dummy','1'); // ensure style update
+      hero?.style.setProperty('--parallax','translateY('+y+'px)');
+      hero?.style.setProperty('--py',y+'px');
+      hero?.style.setProperty('--noop','0'); // no-op
+      hero?.style.setProperty('--parallax','translateY('+y+'px)');
+      hero?.style.setProperty('--py',y+'px');
+      hero?.style.setProperty('--parallax','translateY('+y+'px)');
+      hero.style.setProperty('--parallax','translateY('+y+'px)');
+      hero.style.setProperty('--py',y+'px');
+      hero.style.cssText += ''; // force repaint
+    };
+    // apply transform via inline style on ::before using CSS variable via attribute style? Not possible directly; use filter:
+    // Workaround: update style by setting transform on pseudo through styleTag:
+    const styleTag = document.createElement('style');
+    styleTag.id = 'parallax-style';
+    document.head.appendChild(styleTag);
+    function updateParallax(){
+      const y = Math.min(20, window.scrollY * 0.08);
+      styleTag.textContent = `.hero::before{transform:translateY(${y}px)} .conversion::before{transform:translateY(${y/2}px)}`;
+    }
+    updateParallax();
+    window.addEventListener('scroll', updateParallax, {passive:true});
+  }
+
+  // ===== Reading progress =====
+  const bar = document.querySelector('.read-progress');
+  function setProgress(){
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const ratio = max ? (window.scrollY / max) : 0;
+    bar.style.transform = `scaleX(${Math.min(1, Math.max(0, ratio))})`;
+  }
+  window.addEventListener('scroll', setProgress, {passive:true});
+  window.addEventListener('resize', setProgress);
+  setProgress();
+
+  // ===== FAQ accordion =====
   document.body.addEventListener('click', (e)=>{
     const q=e.target.closest('.faq-q'); if(!q) return;
     const item=q.parentElement; const a=item.querySelector('.faq-a'); const arr=q.querySelector('.arr');
@@ -464,24 +500,121 @@
     if(!open){ a.style.display='block'; arr.style.transform='rotate(180deg)'; }
   });
 
-  // Sticky CTA
+  // ===== Sticky CTA after 50% scroll =====
   const sticky=document.querySelector('.sticky-cta');
-  window.addEventListener('scroll',()=>{ if(window.scrollY>900){sticky.classList.add('show')} else {sticky.classList.remove('show')} });
+  function stickyToggle(){
+    const doc = document.documentElement;
+    const half = (doc.scrollHeight - doc.clientHeight) * 0.5;
+    if(window.scrollY > half){ sticky.classList.add('show'); } else { sticky.classList.remove('show'); }
+  }
+  window.addEventListener('scroll', stickyToggle, {passive:true});
+  stickyToggle();
 
-  // Кнопки оплаты → готово к Stripe backend (/api/checkout)
+  // ===== Payment buttons -> scroll to pricing (Stripe-ready stub) =====
+  function goCheckout(plan){
+    document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'});
+    // Пример Stripe:
+    // fetch('/api/checkout', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan})})
+    //  .then(r=>r.json()).then(d=>{ if(d.url) location = d.url; });
+  }
   document.querySelectorAll('[data-pay]').forEach(b=>{
-    b.addEventListener('click', async (e)=>{
-      e.preventDefault();
-      // Пример подключения Stripe:
-      // const res = await fetch('/api/checkout', {
-      //   method:'POST', headers:{'Content-Type':'application/json'},
-      //   body: JSON.stringify({ plan: b.dataset.pay })
-      // });
-      // const data = await res.json();
-      // if (data.url) window.location = data.url;
-      document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'});
-    });
+    b.addEventListener('click', e=>{ e.preventDefault(); goCheckout(b.dataset.pay); });
   });
+  sticky.addEventListener('click', ()=>goCheckout('full'));
+
+  // ===== Gold glow on price (2.6s pulse) =====
+  const price = document.querySelector('.price');
+  if(price && !reduceMotion){
+    price.classList.add('gold-glow');
+    price.style.animation = 'gold 2.6s ease-in-out infinite';
+  }
+
+  // ===== Confetti in Bonus (SVG particles on canvas) =====
+  (function(){
+    if(reduceMotion) return;
+    const c = document.getElementById('confetti');
+    if(!c) return;
+    const ctx = c.getContext('2d');
+    function size(){ c.width = c.offsetWidth; c.height = c.offsetHeight; }
+    size(); addEventListener('resize', size);
+    const colors = ['#FFD166','#F06A3F','#D54B2A','#90E0EF','#8AC926'];
+    const parts = Array.from({length: 70}, ()=>({x:Math.random()*c.width,y:Math.random()*c.height,vy:0.5+Math.random()*1.2,vx:(Math.random()-.5)*0.6,s:2+Math.random()*4,col:colors[Math.floor(Math.random()*colors.length)],r:Math.random()*Math.PI}));
+    let raf;
+    function tick(){
+      ctx.clearRect(0,0,c.width,c.height);
+      parts.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.r+=0.02;
+        if(p.y>c.height) p.y=-10;
+        if(p.x>c.width) p.x=-10; if(p.x<-10) p.x=c.width+10;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+        ctx.fillStyle=p.col; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
+        ctx.restore();
+      });
+      raf = requestAnimationFrame(tick);
+    }
+    tick();
+    // Очистка на уходе со страницы
+    window.addEventListener('beforeunload', ()=> cancelAnimationFrame(raf));
+  })();
+
+  // ===== Exit-intent modal (desktop only, 1 раз) =====
+  (function(){
+    const isDesktop = matchMedia('(pointer:fine)').matches && window.innerWidth >= 920;
+    const modalWrap = document.getElementById('exitModal');
+    if(!isDesktop || !modalWrap) return;
+    if(localStorage.getItem('exitShown')==='1') return;
+
+    const closeBtns = modalWrap.querySelectorAll('.modal-close, .modal-close-2');
+    let lastFocused = null;
+
+    function open(){
+      lastFocused = document.activeElement;
+      modalWrap.style.display='flex';
+      localStorage.setItem('exitShown','1');
+      trapStart();
+    }
+    function close(){
+      modalWrap.style.display='none';
+      releaseTrap();
+      lastFocused && lastFocused.focus();
+    }
+
+    // фокус-трап
+    let focusables=[], firstEl, lastEl;
+    function trapStart(){
+      focusables = modalWrap.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      firstEl = focusables[0]; lastEl = focusables[focusables.length-1];
+      firstEl && firstEl.focus();
+      document.addEventListener('keydown', trapKey);
+    }
+    function releaseTrap(){ document.removeEventListener('keydown', trapKey); }
+    function trapKey(e){
+      if(e.key==='Escape'){ e.preventDefault(); close(); }
+      if(e.key==='Tab'){
+        if(e.shiftKey && document.activeElement===firstEl){ e.preventDefault(); lastEl.focus(); }
+        else if(!e.shiftKey && document.activeElement===lastEl){ e.preventDefault(); firstEl.focus(); }
+      }
+    }
+
+    closeBtns.forEach(b=> b.addEventListener('click', close));
+
+    document.addEventListener('mouseout', (e)=>{
+      if(e.clientY<=0){ open(); }
+    }, {once:true});
+  })();
+
+  // ===== Faux viewers (ethics note: demo only) =====
+  if(FEATURE_VIEWERS){
+    let viewers = 8 + Math.floor(Math.random()*6);
+    const el = document.createElement('div');
+    el.setAttribute('aria-live','polite');
+    el.style.cssText='position:fixed;right:12px;bottom:84px;background:#111;color:#fff;padding:8px 12px;border-radius:12px;font-weight:800;box-shadow:0 10px 20px rgba(0,0,0,.25);z-index:999';
+    document.body.appendChild(el);
+    const update = ()=>{ el.textContent = `Сейчас смотрят: ${viewers} человек`; };
+    update();
+    setInterval(()=>{ viewers += (Math.random()<0.5?-1:1)*(Math.random()<0.5?1:0); viewers = Math.max(5, Math.min(18, viewers)); update(); }, 18000);
+    // Честность: это демонстрация без бэкенда; отключено по умолчанию (см. FEATURE_VIEWERS)
+  }
 </script>
 </body>
 </html>
